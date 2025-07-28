@@ -1,0 +1,116 @@
+version: '3.8'
+
+services:
+  ai-support-service:
+    build:
+      context: ..
+      dockerfile: 11-ai-support-service/Dockerfile
+    container_name: ai-support-service
+    ports:
+      - "8091:8091"
+    environment:
+      # Quarkus configuration
+      QUARKUS_PROFILE: prod
+      QUARKUS_HTTP_HOST: 0.0.0.0
+      QUARKUS_HTTP_PORT: 8091
+      
+      # Database configuration (if needed for future enhancements)
+      # QUARKUS_DATASOURCE_JDBC_URL: jdbc:postgresql://postgres:5432/ai_support
+      # QUARKUS_DATASOURCE_USERNAME: ai_user
+      # QUARKUS_DATASOURCE_PASSWORD: ai_password
+      
+      # Azure OpenAI configuration
+      AZURE_OPENAI_ENDPOINT: ${AZURE_OPENAI_ENDPOINT:-https://dummy-endpoint.openai.azure.com/}
+      AZURE_OPENAI_API_KEY: ${AZURE_OPENAI_API_KEY:-dummy-key-for-docker}
+      AZURE_OPENAI_CHAT_DEPLOYMENT_NAME: ${AZURE_OPENAI_CHAT_DEPLOYMENT_NAME:-gpt-4o}
+      AZURE_OPENAI_EMBEDDING_DEPLOYMENT_NAME: ${AZURE_OPENAI_EMBEDDING_DEPLOYMENT_NAME:-text-embedding-3-large}
+      AZURE_OPENAI_API_VERSION: ${AZURE_OPENAI_API_VERSION:-2024-02-15-preview}
+      AZURE_OPENAI_TEMPERATURE: ${AZURE_OPENAI_TEMPERATURE:-0.7}
+      AZURE_OPENAI_MAX_TOKENS: ${AZURE_OPENAI_MAX_TOKENS:-2000}
+      AZURE_OPENAI_TIMEOUT: ${AZURE_OPENAI_TIMEOUT:-60s}
+      AZURE_OPENAI_MAX_RETRIES: ${AZURE_OPENAI_MAX_RETRIES:-3}
+      
+      # External Service URLs
+      USER_MANAGEMENT_SERVICE_URL: ${USER_MANAGEMENT_SERVICE_URL:-http://localhost:8081}
+      PRODUCT_CATALOG_SERVICE_URL: ${PRODUCT_CATALOG_SERVICE_URL:-http://localhost:8083}
+      ORDER_MANAGEMENT_SERVICE_URL: ${ORDER_MANAGEMENT_SERVICE_URL:-http://localhost:8085}
+      INVENTORY_MANAGEMENT_SERVICE_URL: ${INVENTORY_MANAGEMENT_SERVICE_URL:-http://localhost:8084}
+      
+      # Redis configuration (if needed for caching)
+      # QUARKUS_REDIS_HOSTS: redis://redis:6379
+      
+      # Logging configuration
+      QUARKUS_LOG_LEVEL: INFO
+      QUARKUS_LOG_CONSOLE_ENABLE: true
+      QUARKUS_LOG_CONSOLE_FORMAT: "%d{HH:mm:ss} %-5p [%c{2.}] (%t) %s%e%n"
+      
+      # AI Service specific configuration
+      AI_SERVICE_MAX_TOKENS: 2000
+      AI_SERVICE_TEMPERATURE: 0.7
+      AI_SERVICE_TIMEOUT_SECONDS: 60
+    
+    # Health check
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8091/q/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+    
+    # Restart policy
+    restart: unless-stopped
+    
+    # Optional: Redis for caching (uncomment if needed)
+    # depends_on:
+    #   - redis
+    
+    networks:
+      - ai-support-network
+
+  # Optional: Redis service for caching (uncomment if needed)
+  # redis:
+  #   image: redis:7.2-alpine
+  #   container_name: ai-support-redis
+  #   ports:
+  #     - "6379:6379"
+  #   volumes:
+  #     - redis_data:/data
+  #   command: redis-server --appendonly yes
+  #   restart: unless-stopped
+  #   networks:
+  #     - ai-support-network
+
+  # Optional: PostgreSQL for persistent data (uncomment if needed)
+  # postgres:
+  #   image: postgres:16-alpine
+  #   container_name: ai-support-postgres
+  #   environment:
+  #     POSTGRES_DB: ai_support
+  #     POSTGRES_USER: ai_user
+  #     POSTGRES_PASSWORD: ai_password
+  #   ports:
+  #     - "5432:5432"
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data
+  #   restart: unless-stopped
+  #   networks:
+  #     - ai-support-network
+
+networks:
+  ai-support-network:
+    driver: bridge
+
+# Optional: Volumes for data persistence (uncomment if needed)
+# volumes:
+#   redis_data:
+#   postgres_data:

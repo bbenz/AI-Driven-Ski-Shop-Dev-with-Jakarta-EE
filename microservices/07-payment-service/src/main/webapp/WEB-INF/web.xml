@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="https://jakarta.ee/xml/ns/jakartaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee 
+                             https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd"
+         version="6.0">
+    
+    <display-name>Payment Service</display-name>
+    <description>スキーリゾート決済サービス</description>
+    
+    <!-- Jakarta RESTサーブレット設定 -->
+    <servlet>
+        <servlet-name>jakarta.ws.rs.core.Application</servlet-name>
+        <servlet-class>org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher</servlet-class>
+        <init-param>
+            <param-name>jakarta.ws.rs.Application</param-name>
+            <param-value>com.skiresort.payment.PaymentApplication</param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    
+    <servlet-mapping>
+        <servlet-name>jakarta.ws.rs.core.Application</servlet-name>
+        <url-pattern>/api/*</url-pattern>
+    </servlet-mapping>
+    
+    <!-- セキュリティ設定 -->
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>Payment API</web-resource-name>
+            <url-pattern>/api/payments/*</url-pattern>
+            <url-pattern>/api/refunds/*</url-pattern>
+            <http-method>GET</http-method>
+            <http-method>POST</http-method>
+            <http-method>PUT</http-method>
+            <http-method>DELETE</http-method>
+        </web-resource-collection>
+        <auth-constraint>
+            <role-name>payment-user</role-name>
+            <role-name>payment-admin</role-name>
+        </auth-constraint>
+    </security-constraint>
+    
+    <!-- ロール定義 -->
+    <security-role>
+        <role-name>payment-user</role-name>
+    </security-role>
+    <security-role>
+        <role-name>payment-admin</role-name>
+    </security-role>
+    
+    <!-- ログイン設定 -->
+    <login-config>
+        <auth-method>BASIC</auth-method>
+        <realm-name>PaymentServiceRealm</realm-name>
+    </login-config>
+    
+    <!-- エラーページ設定 -->
+    <error-page>
+        <error-code>404</error-code>
+        <location>/error/404.html</location>
+    </error-page>
+    <error-page>
+        <error-code>500</error-code>
+        <location>/error/500.html</location>
+    </error-page>
+    
+    <!-- セッション設定 -->
+    <session-config>
+        <session-timeout>30</session-timeout>
+        <cookie-config>
+            <http-only>true</http-only>
+            <secure>true</secure>
+        </cookie-config>
+    </session-config>
+    
+</web-app>

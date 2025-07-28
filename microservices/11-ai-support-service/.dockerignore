@@ -1,0 +1,41 @@
+# Git
+.git
+.gitignore
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Maven
+target/
+!target/quarkus-app/
+
+# IDE
+.vscode/
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Environment
+# .env
+.env.local
+.env.*.local
+
+# Documentation
+*.md
+
+# Test files
+src/test/
+
+# Temporary files
+*.tmp
+*.temp

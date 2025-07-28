@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence xmlns="https://jakarta.ee/xml/ns/persistence"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence
+                                 https://jakarta.ee/xml/ns/persistence/persistence_3_0.xsd"
+             version="3.0">
+
+    <persistence-unit name="authPU" transaction-type="JTA">
+        <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+        
+        <!-- データソース -->
+        <jta-data-source>java:jboss/datasources/PostgreSQLDS</jta-data-source>
+        
+        <!-- エンティティクラス -->
+        <class>com.skiresort.auth.entity.UserCredential</class>
+        <class>com.skiresort.auth.entity.OAuth2Credential</class>
+        
+        <!-- プロパティ -->
+        <properties>
+            <!-- Hibernate設定 -->
+            <property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQLDialect"/>
+            <property name="hibernate.hbm2ddl.auto" value="update"/>
+            <property name="hibernate.show_sql" value="false"/>
+            <property name="hibernate.format_sql" value="true"/>
+            <property name="hibernate.use_sql_comments" value="true"/>
+            
+            <!-- 接続プール設定 -->
+            <property name="hibernate.connection.pool_size" value="10"/>
+            <property name="hibernate.connection.autocommit" value="false"/>
+            
+            <!-- キャッシュ設定 -->
+            <property name="hibernate.cache.use_second_level_cache" value="true"/>
+            <property name="hibernate.cache.use_query_cache" value="true"/>
+            <property name="hibernate.cache.region.factory_class" value="org.hibernate.cache.jcache.JCacheRegionFactory"/>
+            
+            <!-- 統計情報 -->
+            <property name="hibernate.generate_statistics" value="false"/>
+            
+            <!-- セキュリティ関連 -->
+            <property name="hibernate.connection.handling_mode" value="DELAYED_ACQUISITION_AND_RELEASE_AFTER_TRANSACTION"/>
+            
+            <!-- ログ設定 -->
+            <property name="hibernate.jdbc.time_zone" value="UTC"/>
+            
+            <!-- バッチ処理設定 -->
+            <property name="hibernate.jdbc.batch_size" value="25"/>
+            <property name="hibernate.order_inserts" value="true"/>
+            <property name="hibernate.order_updates" value="true"/>
+            <property name="hibernate.jdbc.batch_versioned_data" value="true"/>
+        </properties>
+    </persistence-unit>
+</persistence>

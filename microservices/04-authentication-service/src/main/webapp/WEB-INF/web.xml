@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="https://jakarta.ee/xml/ns/jakartaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee 
+         https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd"
+         version="6.0">
+
+    <display-name>Authentication Service</display-name>
+    <description>Ski Resort Authentication Service - MicroProfile JWT 2.1</description>
+
+    <!-- CORS Configuration -->
+    <filter>
+        <filter-name>CorsFilter</filter-name>
+        <filter-class>com.skiresort.auth.filter.CorsFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>CorsFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <!-- Security constraints for protected resources -->
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>Protected Resources</web-resource-name>
+            <url-pattern>/api/auth/profile/*</url-pattern>
+            <url-pattern>/api/auth/refresh</url-pattern>
+            <http-method>GET</http-method>
+            <http-method>PUT</http-method>
+            <http-method>POST</http-method>
+        </web-resource-collection>
+        <auth-constraint>
+            <role-name>user</role-name>
+            <role-name>admin</role-name>
+            <role-name>employee</role-name>
+        </auth-constraint>
+    </security-constraint>
+
+    <!-- Login configuration for MicroProfile JWT -->
+    <login-config>
+        <auth-method>MP-JWT</auth-method>
+        <realm-name>ski-equipment-shop</realm-name>
+    </login-config>
+
+    <!-- Security roles -->
+    <security-role>
+        <role-name>user</role-name>
+    </security-role>
+    <security-role>
+        <role-name>admin</role-name>
+    </security-role>
+    <security-role>
+        <role-name>employee</role-name>
+    </security-role>
+
+</web-app>

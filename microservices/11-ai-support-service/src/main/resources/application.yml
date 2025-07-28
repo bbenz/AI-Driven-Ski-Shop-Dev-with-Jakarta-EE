@@ -1,0 +1,145 @@
+# AI Support Service Configuration
+quarkus:
+  application:
+    name: ai-support-service
+    version: 1.0.0
+  
+  # HTTP Configuration
+  http:
+    port: 8091
+    cors:
+      ~: true
+      origins: "*"
+      methods: "*"
+      headers: "*"
+  
+  # Database Configuration (Disabled for simplicity)
+  datasource:
+    jdbc: false
+  
+  hibernate-orm:
+    enabled: false
+  
+  # OIDC Configuration (Disabled)
+  oidc:
+    tenant-enabled: false
+    
+  # Disable Redis for now
+  redis:
+    devservices:
+      enabled: false
+    
+  # Disable Dev Services
+  devservices:
+    enabled: false
+  
+  # Disable specific dev services
+  keycloak:
+    devservices:
+      enabled: false
+  
+  kafka:
+    devservices:
+      enabled: false
+  
+  # Cache Configuration
+  cache:
+    caffeine:
+      "conversation-cache":
+        expire-after-write: PT30M
+        maximum-size: 1000
+      "knowledge-cache":
+        expire-after-write: PT1H
+        maximum-size: 500
+  
+  # OpenAPI Configuration
+  smallrye-openapi:
+    info-title: AI Support Service API
+    info-version: 1.0.0
+    info-description: AI Support Service for SkiShop with LangChain4j and Azure OpenAI
+    info-license-name: Apache 2.0
+  
+  # Health Check Configuration
+  smallrye-health:
+    ui:
+      enable: true
+  
+  # Metrics Configuration
+  micrometer:
+    binder:
+      http-server:
+        enabled: true
+    export:
+      prometheus:
+        enabled: true
+  
+  # Logging Configuration
+  log:
+    level: INFO
+    category:
+      com.skishop.ai: DEBUG
+      dev.langchain4j: INFO
+    console:
+      enable: true
+      format: "%d{HH:mm:ss} %-5p [%c{2.}] (%t) %s%e%n"
+    file:
+      enable: false
+
+# Azure OpenAI Configuration
+azure:
+  openai:
+    api-key: ${AZURE_OPENAI_API_KEY:}
+    endpoint: ${AZURE_OPENAI_ENDPOINT:https://your-openai-instance.openai.azure.com}
+    chat-deployment-name: ${AZURE_OPENAI_CHAT_DEPLOYMENT_NAME:gpt-4.1}
+    embedding-deployment-name: ${AZURE_OPENAI_EMBEDDING_DEPLOYMENT_NAME:text-embedding-3-small}
+    api-version: ${AZURE_OPENAI_API_VERSION:2024-02-15-preview}
+    temperature: ${AZURE_OPENAI_TEMPERATURE:0.7}
+    max-tokens: ${AZURE_OPENAI_MAX_TOKENS:2000}
+    timeout: ${AZURE_OPENAI_TIMEOUT:60s}
+    max-retries: ${AZURE_OPENAI_MAX_RETRIES:3}
+
+# AI Service Configuration
+ai:
+  service:
+    max-input-length: 8000
+    fallback-enabled: true
+    retry:
+      max-attempts: 3
+      delay: 1000
+      multiplier: 2
+      max-delay: 5000
+  memory:
+    max-messages: 10
+    timeout: PT30M
+  conversation:
+    session-timeout: PT30M
+    max-sessions-per-user: 5
+
+# External Service URLs
+external:
+  services:
+    user-management: ${USER_MANAGEMENT_SERVICE_URL:http://localhost:8081}
+    product-catalog: ${PRODUCT_CATALOG_SERVICE_URL:http://localhost:8082}
+    order-management: ${ORDER_MANAGEMENT_SERVICE_URL:http://localhost:8085}
+    inventory-management: ${INVENTORY_MANAGEMENT_SERVICE_URL:http://localhost:8086}
+
+  # Security Configuration (Disabled for simplicity)
+  security:
+    users:
+      embedded:
+        enabled: false
+
+  # Management Configuration  
+  management:
+    enabled: true
+    port: 9091
+    
+  # Native Build Configuration
+  native:
+    resources:
+      includes: "**/*.properties,**/*.json"
+    additional-build-args: "--enable-preview"
+
+  # JVM Configuration for Java 21 Preview Features
+  jvm:
+    args: "--enable-preview"

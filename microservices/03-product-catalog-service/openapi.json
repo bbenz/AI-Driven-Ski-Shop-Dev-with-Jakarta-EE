@@ -1,0 +1,945 @@
+---
+openapi: 3.0.3
+info:
+  title: Product Catalog Service API
+  description: スキー用品ショップ 商品カタログサービス API
+  contact:
+    email: dev@ski-shop.com
+  version: 1.0.0
+servers:
+- url: "{\"servers\": [{\"url\": \"https://api.ski-shop.com\""
+- url: "\"description\": \"Production\"}]}"
+tags:
+- name: Categories
+  description: カテゴリ管理API
+- name: Products
+  description: 商品管理API
+paths:
+  /api/v1/categories:
+    get:
+      tags:
+      - Categories
+      summary: 全カテゴリ一覧取得
+      description: 全カテゴリの一覧を商品数と共に取得します
+      responses:
+        "200":
+          description: カテゴリ一覧
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryWithProductCountResponse'
+  /api/v1/categories/level/{level}:
+    get:
+      tags:
+      - Categories
+      summary: レベル別カテゴリ取得
+      description: 指定されたレベルのカテゴリ一覧を商品数と共に取得します
+      parameters:
+      - name: level
+        in: path
+        required: true
+        schema:
+          format: int32
+          type: integer
+      responses:
+        "200":
+          description: 指定レベルのカテゴリ一覧
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryWithProductCountResponse'
+  /api/v1/categories/main:
+    get:
+      tags:
+      - Categories
+      summary: メインカテゴリ一覧取得
+      description: メインカテゴリ（レベル0）の一覧を商品数と共に取得します
+      responses:
+        "200":
+          description: メインカテゴリ一覧
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryWithProductCountResponse'
+  /api/v1/categories/path:
+    get:
+      tags:
+      - Categories
+      summary: パスでカテゴリ取得
+      description: 指定されたパスのカテゴリ詳細を取得します
+      parameters:
+      - name: path
+        in: query
+        schema:
+          type: string
+      responses:
+        "200":
+          description: カテゴリ詳細
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryResponse'
+        "404":
+          description: カテゴリが見つかりません
+        "400":
+          description: パスパラメータが必須です
+  /api/v1/categories/root:
+    get:
+      tags:
+      - Categories
+      summary: ルートカテゴリ一覧取得
+      description: ルートレベルのカテゴリ一覧を商品数と共に取得します
+      responses:
+        "200":
+          description: ルートカテゴリ一覧
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryWithProductCountResponse'
+  /api/v1/categories/{categoryId}:
+    get:
+      tags:
+      - Categories
+      summary: カテゴリ詳細取得
+      description: 指定されたIDのカテゴリ詳細を取得します
+      parameters:
+      - name: categoryId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/UUID'
+      responses:
+        "200":
+          description: カテゴリ詳細
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryResponse'
+        "404":
+          description: カテゴリが見つかりません
+  /api/v1/categories/{categoryId}/children:
+    get:
+      tags:
+      - Categories
+      summary: 子カテゴリ一覧取得
+      description: 指定されたカテゴリの子カテゴリ一覧を商品数と共に取得します
+      parameters:
+      - name: categoryId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/UUID'
+      responses:
+        "200":
+          description: 子カテゴリ一覧
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryWithProductCountResponse'
+  /api/v1/categories/{categoryId}/products:
+    get:
+      tags:
+      - Categories
+      summary: カテゴリの商品一覧取得
+      description: 指定されたカテゴリに属する商品一覧を取得します
+      parameters:
+      - name: categoryId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/UUID'
+      - name: limit
+        in: query
+        schema:
+          format: int32
+          default: 10
+          type: integer
+      responses:
+        "200":
+          description: カテゴリと商品一覧
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryWithProductsResponse'
+        "404":
+          description: カテゴリが見つかりません
+  /api/v1/categories/{categoryId}/subcategories:
+    get:
+      tags:
+      - Categories
+      summary: サブカテゴリ一覧取得
+      description: 指定されたカテゴリのサブカテゴリ一覧を商品数と共に取得します
+      parameters:
+      - name: categoryId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/UUID'
+      responses:
+        "200":
+          description: サブカテゴリ一覧
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryWithProductCountResponse'
+  /api/v1/categories/{categoryId}/subcategories/products:
+    get:
+      tags:
+      - Categories
+      summary: サブカテゴリ毎の商品一覧取得
+      description: 指定されたカテゴリのサブカテゴリ毎に商品一覧を取得します
+      parameters:
+      - name: categoryId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/UUID'
+      - name: limit
+        in: query
+        schema:
+          format: int32
+          default: 5
+          type: integer
+      responses:
+        "200":
+          description: サブカテゴリ毎の商品一覧
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryWithProductsResponse'
+        "404":
+          description: カテゴリが見つかりません
+  /api/v1/products:
+    get:
+      tags:
+      - Products
+      summary: 商品一覧・検索
+      description: 検索条件に基づいて商品一覧を取得します
+      parameters:
+      - name: brandId
+        in: query
+        description: ブランドID
+        schema:
+          $ref: '#/components/schemas/UUID'
+      - name: categoryId
+        in: query
+        description: カテゴリID
+        schema:
+          $ref: '#/components/schemas/UUID'
+      - name: difficultyLevel
+        in: query
+        description: 難易度レベル
+        schema:
+          $ref: '#/components/schemas/DifficultyLevel'
+      - name: maxPrice
+        in: query
+        description: 最高価格
+        schema:
+          format: double
+          type: number
+      - name: minPrice
+        in: query
+        description: 最低価格
+        schema:
+          format: double
+          type: number
+      - name: page
+        in: query
+        description: ページ番号
+        schema:
+          format: int32
+          default: 0
+          type: integer
+      - name: q
+        in: query
+        description: 検索キーワード
+        schema:
+          type: string
+      - name: search
+        in: query
+        description: 検索キーワード（searchパラメータ）
+        schema:
+          type: string
+      - name: size
+        in: query
+        description: 1ページあたりの件数
+        schema:
+          format: int32
+          default: 20
+          type: integer
+      - name: skiType
+        in: query
+        description: スキータイプ
+        schema:
+          $ref: '#/components/schemas/SkiType'
+      - name: sort
+        in: query
+        description: ソート順
+        schema:
+          default: created_desc
+          enum:
+          - name_asc
+          - name_desc
+          - price_asc
+          - price_desc
+          - created_desc
+          - popularity
+      - name: sortBy
+        in: query
+        description: ソートフィールド
+        schema:
+          enum:
+          - name
+          - price
+          - created
+          - popularity
+      - name: sortOrder
+        in: query
+        description: ソート方向
+        schema:
+          enum:
+          - asc
+          - desc
+      responses:
+        "200":
+          description: 商品一覧
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProductSummaryResponse'
+    post:
+      tags:
+      - Products
+      summary: 商品登録
+      description: 新しい商品を登録します
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductCreateRequest'
+      responses:
+        "201":
+          description: 商品登録成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductResponse'
+        "400":
+          description: リクエストが不正です
+        "409":
+          description: SKUが重複しています
+  /api/v1/products/brand/{brandId}:
+    get:
+      tags:
+      - Products
+      summary: ブランド別商品一覧
+      description: 指定されたブランドの商品一覧を取得します
+      parameters:
+      - name: brandId
+        in: path
+        description: ブランドID
+        required: true
+        schema:
+          $ref: '#/components/schemas/UUID'
+      responses:
+        "200":
+          description: ブランド別商品一覧
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProductSummaryResponse'
+  /api/v1/products/category/{categoryId}:
+    get:
+      tags:
+      - Products
+      summary: カテゴリ別商品一覧
+      description: 指定されたカテゴリの商品一覧を取得します
+      parameters:
+      - name: categoryId
+        in: path
+        description: カテゴリID
+        required: true
+        schema:
+          $ref: '#/components/schemas/UUID'
+      responses:
+        "200":
+          description: カテゴリ別商品一覧
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProductSummaryResponse'
+  /api/v1/products/featured:
+    get:
+      tags:
+      - Products
+      summary: 注目商品一覧
+      description: 注目商品の一覧を取得します
+      responses:
+        "200":
+          description: 注目商品一覧
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProductSummaryResponse'
+  /api/v1/products/sku/{sku}:
+    get:
+      tags:
+      - Products
+      summary: SKUで商品取得
+      description: 指定されたSKUの商品詳細を取得します
+      parameters:
+      - name: sku
+        in: path
+        description: 商品SKU
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: 商品詳細
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductResponse'
+        "404":
+          description: 商品が見つかりません
+  /api/v1/products/{productId}:
+    get:
+      tags:
+      - Products
+      summary: 商品詳細取得
+      description: 指定されたIDの商品詳細を取得します
+      parameters:
+      - name: productId
+        in: path
+        description: 商品ID
+        required: true
+        schema:
+          $ref: '#/components/schemas/UUID'
+      responses:
+        "200":
+          description: 商品詳細
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductResponse'
+        "404":
+          description: 商品が見つかりません
+    put:
+      tags:
+      - Products
+      summary: 商品更新
+      description: 指定されたIDの商品を更新します
+      parameters:
+      - name: productId
+        in: path
+        description: 商品ID
+        required: true
+        schema:
+          $ref: '#/components/schemas/UUID'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductCreateRequest'
+      responses:
+        "200":
+          description: 商品更新成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductResponse'
+        "400":
+          description: リクエストが不正です
+        "404":
+          description: 商品が見つかりません
+        "409":
+          description: SKUが重複しています
+    delete:
+      tags:
+      - Products
+      summary: 商品削除
+      description: 指定されたIDの商品を削除します
+      parameters:
+      - name: productId
+        in: path
+        description: 商品ID
+        required: true
+        schema:
+          $ref: '#/components/schemas/UUID'
+      responses:
+        "204":
+          description: 商品削除成功
+        "404":
+          description: 商品が見つかりません
+components:
+  schemas:
+    BrandSummaryResponse:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/UUID'
+        name:
+          type: string
+        logoUrl:
+          type: string
+        country:
+          type: string
+    CategoryResponse:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/UUID'
+        name:
+          type: string
+        description:
+          type: string
+        path:
+          type: string
+        level:
+          format: int32
+          type: integer
+        sortOrder:
+          format: int32
+          type: integer
+        imageUrl:
+          type: string
+        isActive:
+          type: boolean
+        productCount:
+          format: int64
+          type: integer
+        parent:
+          $ref: '#/components/schemas/CategorySummaryResponse'
+        children:
+          type: array
+          items:
+            $ref: '#/components/schemas/CategorySummaryResponse'
+        createdAt:
+          $ref: '#/components/schemas/LocalDateTime'
+        updatedAt:
+          $ref: '#/components/schemas/LocalDateTime'
+        root:
+          type: boolean
+        subCategory:
+          type: boolean
+        subCategoryCount:
+          format: int32
+          type: integer
+        active:
+          type: boolean
+    CategorySummaryResponse:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/UUID'
+        name:
+          type: string
+        path:
+          type: string
+    CategoryWithProductCountResponse:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/UUID'
+        name:
+          type: string
+        description:
+          type: string
+        path:
+          type: string
+        level:
+          format: int32
+          type: integer
+        sortOrder:
+          format: int32
+          type: integer
+        imageUrl:
+          type: string
+        isActive:
+          type: boolean
+        productCount:
+          format: int64
+          type: integer
+        active:
+          type: boolean
+    CategoryWithProductsResponse:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/UUID'
+        name:
+          type: string
+        description:
+          type: string
+        path:
+          type: string
+        level:
+          format: int32
+          type: integer
+        sortOrder:
+          format: int32
+          type: integer
+        imageUrl:
+          type: string
+        active:
+          type: boolean
+        productCount:
+          format: int64
+          type: integer
+        products:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductSummaryResponse'
+    DifficultyLevel:
+      enum:
+      - BEGINNER
+      - INTERMEDIATE
+      - ADVANCED
+      - EXPERT
+      type: string
+    Flex:
+      enum:
+      - SOFT
+      - MEDIUM
+      - HARD
+      - VERY_HARD
+      type: string
+    LocalDateTime:
+      format: date-time
+      type: string
+      example: 2022-03-10T12:15:50
+    Material:
+      enum:
+      - WOOD_CORE
+      - CARBON_FIBER
+      - TITANIUM
+      - SYNTHETIC
+      - ALUMINUM
+      - PLASTIC
+      - FIBERGLASS
+      - STEEL
+      - WAX
+      - LEATHER
+      - COMPOSITE
+      type: string
+    ProductCreateRequest:
+      required:
+      - sku
+      - name
+      - categoryId
+      - brandId
+      - specification
+      - basePrice
+      type: object
+      properties:
+        sku:
+          maxLength: 100
+          pattern: "^[A-Z0-9-]+$"
+          type: string
+        name:
+          maxLength: 255
+          pattern: \S
+          type: string
+        description:
+          maxLength: 2000
+          type: string
+        shortDescription:
+          maxLength: 500
+          type: string
+        categoryId:
+          $ref: '#/components/schemas/UUID'
+        brandId:
+          $ref: '#/components/schemas/UUID'
+        specification:
+          $ref: '#/components/schemas/ProductSpecificationRequest'
+        basePrice:
+          minimum: 0
+          exclusiveMinimum: true
+          type: number
+        salePrice:
+          minimum: 0
+          exclusiveMinimum: true
+          type: number
+        costPrice:
+          minimum: 0
+          exclusiveMinimum: true
+          type: number
+        tags:
+          maxItems: 20
+          uniqueItems: true
+          type: array
+          items:
+            type: string
+        additionalSpecs:
+          type: object
+          additionalProperties:
+            type: string
+        status:
+          $ref: '#/components/schemas/ProductStatusRequest'
+    ProductImageResponse:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/UUID'
+        imageUrl:
+          type: string
+        altText:
+          type: string
+        imageType:
+          type: string
+        sortOrder:
+          format: int32
+          type: integer
+        isPrimary:
+          type: boolean
+        createdAt:
+          $ref: '#/components/schemas/LocalDateTime'
+        primary:
+          type: boolean
+    ProductResponse:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/UUID'
+        sku:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        shortDescription:
+          type: string
+        category:
+          $ref: '#/components/schemas/CategorySummaryResponse'
+        brand:
+          $ref: '#/components/schemas/BrandSummaryResponse'
+        specification:
+          $ref: '#/components/schemas/ProductSpecificationResponse'
+        basePrice:
+          type: number
+        salePrice:
+          type: number
+        currentPrice:
+          type: number
+        onSale:
+          type: boolean
+        discountPercentage:
+          format: int32
+          type: integer
+        status:
+          $ref: '#/components/schemas/ProductStatusResponse'
+        tags:
+          uniqueItems: true
+          type: array
+          items:
+            type: string
+        images:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductImageResponse'
+        variants:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductVariantResponse'
+        salesCount:
+          format: int64
+          type: integer
+        viewCount:
+          format: int64
+          type: integer
+        createdAt:
+          $ref: '#/components/schemas/LocalDateTime'
+        updatedAt:
+          $ref: '#/components/schemas/LocalDateTime'
+    ProductSpecificationRequest:
+      required:
+      - material
+      - skiType
+      - difficultyLevel
+      type: object
+      properties:
+        material:
+          $ref: '#/components/schemas/Material'
+        skiType:
+          $ref: '#/components/schemas/SkiType'
+        difficultyLevel:
+          $ref: '#/components/schemas/DifficultyLevel'
+        length:
+          type: string
+        width:
+          type: string
+        weight:
+          type: string
+        radius:
+          type: string
+        flex:
+          $ref: '#/components/schemas/Flex'
+    ProductSpecificationResponse:
+      type: object
+      properties:
+        material:
+          $ref: '#/components/schemas/Material'
+        skiType:
+          $ref: '#/components/schemas/SkiType'
+        difficultyLevel:
+          $ref: '#/components/schemas/DifficultyLevel'
+        length:
+          type: string
+        width:
+          type: string
+        weight:
+          type: string
+        radius:
+          type: string
+        flex:
+          $ref: '#/components/schemas/Flex'
+    ProductStatusRequest:
+      required:
+      - publishStatus
+      type: object
+      properties:
+        publishStatus:
+          $ref: '#/components/schemas/PublishStatus'
+        isActive:
+          type: boolean
+        isFeatured:
+          type: boolean
+        isDiscontinued:
+          type: boolean
+        active:
+          type: boolean
+        featured:
+          type: boolean
+        discontinued:
+          type: boolean
+    ProductStatusResponse:
+      type: object
+      properties:
+        publishStatus:
+          $ref: '#/components/schemas/PublishStatus'
+        isActive:
+          type: boolean
+        isFeatured:
+          type: boolean
+        isDiscontinued:
+          type: boolean
+        publishedAt:
+          $ref: '#/components/schemas/LocalDateTime'
+        discontinuedAt:
+          $ref: '#/components/schemas/LocalDateTime'
+        active:
+          type: boolean
+        featured:
+          type: boolean
+        discontinued:
+          type: boolean
+    ProductSummaryResponse:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/UUID'
+        sku:
+          type: string
+        name:
+          type: string
+        shortDescription:
+          type: string
+        category:
+          $ref: '#/components/schemas/CategorySummaryResponse'
+        brand:
+          $ref: '#/components/schemas/BrandSummaryResponse'
+        currentPrice:
+          type: number
+        basePrice:
+          type: number
+        isOnSale:
+          type: boolean
+        discountPercentage:
+          format: int32
+          type: integer
+        primaryImageUrl:
+          type: string
+        inStock:
+          type: boolean
+        featured:
+          type: boolean
+        rating:
+          format: double
+          type: number
+        reviewCount:
+          format: int32
+          type: integer
+        tags:
+          uniqueItems: true
+          type: array
+          items:
+            type: string
+        createdAt:
+          $ref: '#/components/schemas/LocalDateTime'
+        onSale:
+          type: boolean
+    ProductVariantResponse:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/UUID'
+        variantType:
+          type: string
+        variantValue:
+          type: string
+        sku:
+          type: string
+        additionalPrice:
+          type: number
+        isDefault:
+          type: boolean
+        stockQuantity:
+          format: int32
+          type: integer
+        price:
+          type: number
+        inStock:
+          type: boolean
+        createdAt:
+          $ref: '#/components/schemas/LocalDateTime'
+        default:
+          type: boolean
+    PublishStatus:
+      enum:
+      - DRAFT
+      - REVIEW_PENDING
+      - PUBLISHED
+      - ARCHIVED
+      type: string
+    SkiType:
+      enum:
+      - ALL_MOUNTAIN
+      - CARVING
+      - FREESTYLE
+      - FREERIDE
+      - MAINTENANCE
+      - MOGUL
+      - POWDER
+      - PROTECTION
+      - RACING
+      - TOURING
+      type: string
+    UUID:
+      format: uuid
+      pattern: "[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}"
+      type: string
+  securitySchemes:
+    SecurityScheme:
+      type: http
+      description: Authentication
+      scheme: bearer
+      bearerFormat: JWT

@@ -1,0 +1,39 @@
+####
+# このDockerfileは、JVMでQuarkusアプリケーションを実行するために使用されます
+#
+# ビルド前に以下を実行してください: ./mvnw package
+#
+# 次に、Dockerイメージをビルドします:
+# docker build -f src/main/docker/Dockerfile.jvm -t quarkus/product-catalog-service-jvm .
+#
+# そして実行します:
+# docker run -i --rm -p 8083:8083 quarkus/product-catalog-service-jvm
+#
+# JARファイル名を変更した場合は、以下のCOPY文も変更してください
+#
+####
+FROM eclipse-temurin:21
+
+ENV LANGUAGE='en_US:en'
+
+# 作業ディレクトリの設定
+WORKDIR /work/
+
+# libファイルをコピー（存在する場合）
+COPY target/quarkus-app/lib/ /work/lib/
+COPY target/quarkus-app/*.jar /work/
+COPY target/quarkus-app/app/ /work/app/
+COPY target/quarkus-app/quarkus/ /work/quarkus/
+
+# アプリケーション実行用ユーザーの設定
+# USER 185
+
+# ポート公開
+EXPOSE 8083
+
+# ヘルスチェック
+HEALTHCHECK --interval=30s --timeout=10s --retries=3 --start-period=40s \
+  CMD curl -f http://localhost:8083/q/health || exit 1
+
+# アプリケーション実行
+ENTRYPOINT ["java", "-jar", "/work/quarkus-run.jar"]
