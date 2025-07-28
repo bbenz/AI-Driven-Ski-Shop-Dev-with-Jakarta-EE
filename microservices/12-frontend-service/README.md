@@ -1,79 +1,83 @@
 # 12-frontend-service
 
-This is the frontend service for the Ski Sales System, built with Next.js and TypeScript. It provides a user interface for customers to manage their ski materials, view information, and access AI support features.
+これはNext.jsとTypeScriptで構築されたスキー販売システムのフロントエンドサービスです。顧客がスキー用品を管理し、情報を閲覧し、AIサポート機能にアクセスするためのユーザーインターフェースを提供します。
 
-## 🔧 Environment Setup
+## 🔧 環境設定
 
-### Prerequisites
+### 前提条件
+
 - Node.js 18+ 
-- npm or yarn
+- npm または yarn
 
-### Environment Configuration
+### 環境変数の設定
 
-1. Copy the environment template:
+1. 環境変数テンプレートをコピー：
+
 ```bash
 cp .env.example .env.local
 ```
 
-2. Edit `.env.local` with your configuration:
+2. `.env.local`を編集して設定を変更：
+
 ```bash
-# Development settings
+# 開発環境用設定
 NEXT_PUBLIC_API_BASE_URL=http://localhost:8080
 NEXT_PUBLIC_USE_API_GATEWAY=false
 NEXT_PUBLIC_DISABLE_DUMMY_USER=false
 ```
 
-**⚠️ Security Warning**: 
-- Never commit `.env.local` to version control
-- Set `NEXT_PUBLIC_DISABLE_DUMMY_USER=true` in production
-- Use API Gateway (`NEXT_PUBLIC_USE_API_GATEWAY=true`) in production
+**⚠️ セキュリティ警告**: 
 
-## Getting Started
+- `.env.local`をバージョン管理にコミットしない
+- 本番環境では`NEXT_PUBLIC_DISABLE_DUMMY_USER=true`に設定
+- 本番環境ではAPIゲートウェイ（`NEXT_PUBLIC_USE_API_GATEWAY=true`）を使用
 
-First, run the development server:
+## はじめに
+
+まず、開発サーバーを起動します：
 
 ```bash
 npx next dev --turbopack --port 3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+ブラウザで [http://localhost:3000](http://localhost:3000) を開いて結果を確認してください。
 
-## Demo User (Development Only)
+## デモユーザー（開発専用）
 
-For testing purposes, a demo user is available in development mode:
+テスト目的で、開発モードでデモユーザーが利用可能です：
 
-- **Email**: `demo@skiresort.com`
-- **Password**: `demo123`
-- **Features**: Access to AI Support and all customer features
+- **メールアドレス**: `demo@skiresort.com`
+- **パスワード**: `demo123`
+- **機能**: AIサポートとすべての顧客機能へのアクセス
 
-### Demo User Controls
+### デモユーザーの操作
 
-- The demo user is automatically enabled in development mode
-- Use the developer control panel (top-left corner) to toggle the demo user on/off
-- Demo user is automatically disabled in production
-- Set `NEXT_PUBLIC_DISABLE_DUMMY_USER=true` in your environment to disable manually
+- デモユーザーは開発モードで自動的に有効化されます
+- 開発者コントロールパネル（左上角）でデモユーザーのオン/オフを切り替え可能
+- デモユーザーは本番環境では自動的に無効化されます
+- 手動で無効にするには`NEXT_PUBLIC_DISABLE_DUMMY_USER=true`を環境変数に設定
 
-### Login Process
+### ログイン手順
 
-1. Go to `/login`
-2. Use the demo credentials or click "デモアカウント情報を入力" button
-3. Click login to access all features including AI Support
+1. `/login`にアクセス
+2. デモ認証情報を使用するか「デモアカウント情報を入力」ボタンをクリック
+3. ログインをクリックしてAIサポートを含むすべての機能にアクセス
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+`app/page.tsx`を編集してページを変更できます。ファイルを編集すると、ページが自動更新されます。
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+このプロジェクトは[`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts)を使用してVercelの新しいフォントファミリー[Geist](https://vercel.com/font)を自動的に最適化・読み込みしています。
 
-## Learn More
+## 詳細情報
 
-To learn more about Next.js, take a look at the following resources:
+Next.jsについて詳しく学ぶには、以下のリソースを参照してください：
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- [Next.js Documentation](https://nextjs.org/docs) - Next.jsの機能とAPIについて学習
+- [Learn Next.js](https://nextjs.org/learn) - インタラクティブなNext.jsチュートリアル
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+[Next.js GitHubリポジトリ](https://github.com/vercel/next.js)もチェックしてみてください - フィードバックやコントリビューションを歓迎します！
 
-## Deploy on Vercel
+## Vercelでのデプロイ
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Next.jsアプリをデプロイする最も簡単な方法は、Next.jsの開発元である[Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme)を使用することです。
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+詳細については、[Next.jsデプロイメント文書](https://nextjs.org/docs/app/building-your-application/deploying)をご確認ください。

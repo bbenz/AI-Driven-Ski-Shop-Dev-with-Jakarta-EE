@@ -1,140 +1,137 @@
-# Ski Resort Management System - Microservices Architecture
+# スキーリゾート管理システム - マイクロサービスアーキテクチャ
 
-## Overview
+## 概要
 
-This is a comprehensive microservices-based ski resort management system built
-with Jakarta EE 11, Java 21 LTS, and WildFly 31.0.1. The system is designed
-to handle all aspects of ski resort operations including user management,
-equipment rental, lift tickets, lessons, payments, and customer support.
+Jakarta EE 11、Java 21 LTS、WildFly 31.0.1を使用して構築された包括的なマイクロサービス型スキーリゾート管理システムです。このシステムは、ユーザー管理、設備レンタル、リフト券、レッスン、決済、カスタマーサポートを含む、スキーリゾート運営のすべての側面を処理するように設計されています。
 
-## Architecture
+## アーキテクチャ
 
-The system follows a microservices architecture pattern with the following components:
+システムは以下のコンポーネントでマイクロサービスアーキテクチャパターンに従っています：
 
-### 🚪 01. API Gateway Service (Port 8080)
+### 🚪 01. APIゲートウェイサービス (Port 8080)
 
-- **Purpose**: Central entry point for all client requests
-- **Features**: Request routing, authentication, rate limiting, CORS handling
-- **Technology**: Jakarta EE 11, JAX-RS, JWT, MicroProfile
-- **Endpoints**: Routes to all downstream services based on path prefixes
+- **目的**: すべてのクライアントリクエストの中央エントリーポイント
+- **機能**: リクエストルーティング、認証、レート制限、CORS処理
+- **技術**: Jakarta EE 11, JAX-RS, JWT, MicroProfile
+- **エンドポイント**: パスプレフィックスに基づいてすべての下流サービスにルーティング
 
-### 👥 02. User Management Service (Port 8081)
+### 👥 02. ユーザー管理サービス (Port 8081)
 
-- **Purpose**: User registration, profile management, authentication data
-- **Features**: User CRUD, profile management, role management, skill level tracking
-- **Technology**: Jakarta EE 11, JPA/Hibernate, PostgreSQL
-- **Entities**: User, UserProfile, UserPreferences
+- **目的**: ユーザー登録、プロファイル管理、認証データ
+- **機能**: ユーザーCRUD、プロファイル管理、ロール管理、スキルレベル追跡
+- **技術**: Jakarta EE 11, JPA/Hibernate, PostgreSQL
+- **エンティティ**: User, UserProfile, UserPreferences
 
-### 🎿 03. Product Catalog Service (Port 8082)
+### 🎿 03. プロダクトカタログサービス (Port 8082)
 
-- **Purpose**: Equipment catalog, lift tickets, lesson packages
-- **Features**: Product management, pricing, availability, categories
-- **Technology**: Jakarta EE 11, JPA/Hibernate, PostgreSQL
-- **Entities**: Product, Category, PriceRule, ProductVariant
+- **目的**: 設備カタログ、リフト券、レッスンパッケージ
+- **機能**: 商品管理、価格設定、在庫状況、カテゴリ
+- **技術**: Jakarta EE 11, JPA/Hibernate, PostgreSQL
+- **エンティティ**: Product, Category, PriceRule, ProductVariant
 
-### 🔐 04. Authentication Service (Port 8083)
+### 🔐 04. 認証サービス (Port 8083)
 
-- **Purpose**: User authentication, JWT token management
-- **Features**: Login/logout, token refresh, session management
-- **Technology**: Jakarta EE 11, JWT, BCrypt, Redis for session storage
-- **Features**: Multi-factor authentication, password reset, account verification
+- **目的**: ユーザー認証、JWTトークン管理
+- **機能**: ログイン/ログアウト、トークン更新、セッション管理
+- **技術**: Jakarta EE 11, JWT, BCrypt, セッションストレージ用Redis
+- **機能**: 多要素認証、パスワードリセット、アカウント確認
 
-### 📦 05. Inventory Management Service (Port 8084)
+### 📦 05. 在庫管理サービス (Port 8084)
 
-- **Purpose**: Equipment inventory, availability tracking
-- **Features**: Stock management, reservations, maintenance tracking
-- **Technology**: Jakarta EE 11, JPA/Hibernate, PostgreSQL
-- **Entities**: Equipment, InventoryItem, Reservation, MaintenanceRecord
+- **目的**: 設備在庫、可用性追跡
+- **機能**: 在庫管理、予約、メンテナンス追跡
+- **技術**: Jakarta EE 11, JPA/Hibernate, PostgreSQL
+- **エンティティ**: Equipment, InventoryItem, Reservation, MaintenanceRecord
 
-### 🛒 06. Order Management Service (Port 8085)
+### 🛒 06. 注文管理サービス (Port 8085)
 
-- **Purpose**: Order processing, booking management
-- **Features**: Order lifecycle, booking confirmations, cancellations
-- **Technology**: Jakarta EE 11, JPA/Hibernate, Event sourcing
-- **Entities**: Order, OrderItem, Booking, Reservation
+- **目的**: 注文処理、予約管理
+- **機能**: 注文ライフサイクル、予約確認、キャンセル
+- **技術**: Jakarta EE 11, JPA/Hibernate, イベントソーシング
+- **エンティティ**: Order, OrderItem, Booking, Reservation
 
-### 💳 07. Payment Service (Port 8086)
+### 💳 07. 決済サービス (Port 8086)
 
-- **Purpose**: Payment processing, transaction management
-- **Features**: Multiple payment methods, refunds, payment tracking
-- **Technology**: Jakarta EE 11, Payment gateway integration, PCI compliance
-- **Entities**: Payment, Transaction, PaymentMethod, Refund
+- **目的**: 決済処理、取引管理
+- **機能**: 複数決済方法、返金、決済追跡
+- **技術**: Jakarta EE 11, 決済ゲートウェイ統合, PCI準拠
+- **エンティティ**: Payment, Transaction, PaymentMethod, Refund
 
-### 🛍️ 08. Shopping Cart Service (Port 8087)
+### 🛍️ 08. ショッピングカートサービス (Port 8087)
 
-- **Purpose**: Shopping cart management, session handling
-- **Features**: Cart persistence, item management, pricing calculation
-- **Technology**: Jakarta EE 11, Redis for cart storage, real-time updates
-- **Features**: Cart sharing, saved carts, automatic cleanup
+- **目的**: ショッピングカート管理、セッション処理
+- **機能**: カート永続化、アイテム管理、価格計算
+- **技術**: Jakarta EE 11, カートストレージ用Redis, リアルタイム更新
+- **機能**: カート共有、保存済みカート、自動クリーンアップ
 
-### 🎫 09. Coupon/Discount Service (Port 8088)
+### 🎫 09. クーポン・割引サービス (Port 8088)
 
-- **Purpose**: Promotional codes, discount management
-- **Features**: Coupon validation, discount calculation, usage tracking
-- **Technology**: Jakarta EE 11, JPA/Hibernate, PostgreSQL
-- **Entities**: Coupon, Discount, PromotionRule, UsageRecord
+- **目的**: プロモーションコード、割引管理
+- **機能**: クーポン検証、割引計算、使用状況追跡
+- **技術**: Jakarta EE 11, JPA/Hibernate, PostgreSQL
+- **エンティティ**: Coupon, Discount, PromotionRule, UsageRecord
 
-### ⭐ 10. Points/Loyalty Service (Port 8089)
+### ⭐ 10. ポイント・ロイヤルティサービス (Port 8089)
 
-- **Purpose**: Customer loyalty program, points management
-- **Features**: Points earning, redemption, tier management
-- **Technology**: Jakarta EE 11, JPA/Hibernate, PostgreSQL
-- **Entities**: LoyaltyAccount, PointsTransaction, LoyaltyTier
+- **目的**: 顧客ロイヤルティプログラム、ポイント管理
+- **機能**: ポイント獲得、償還、ティア管理
+- **技術**: Jakarta EE 11, JPA/Hibernate, PostgreSQL
+- **エンティティ**: LoyaltyAccount, PointsTransaction, LoyaltyTier
 
-### 🤖 11. AI Support Service (Port 8090)
+### 🤖 11. AIサポートサービス (Port 8090)
 
-- **Purpose**: Intelligent customer support, chatbot
-- **Features**: Natural language processing, automated responses, escalation
-- **Technology**: Jakarta EE 11, AI/ML integration, WebSocket for real-time chat
-- **Features**: Multi-language support, sentiment analysis
+- **目的**: インテリジェントカスタマーサポート、チャットボット
+- **機能**: 自然言語処理、自動応答、エスカレーション
+- **技術**: Jakarta EE 11, AI/ML統合, リアルタイムチャット用WebSocket
+- **機能**: 多言語サポート、感情分析
 
-### 🖥️ 12. Frontend Service (Port 8091)
+### 🖥️ 12. フロントエンドサービス (Port 8091)
 
-- **Purpose**: Web frontend, customer and admin interfaces
-- **Features**: Responsive UI, real-time updates, PWA capabilities
-- **Technology**: Modern web technologies, WebSocket, Service Worker
-- **Interfaces**: Customer portal, admin dashboard, staff interface
+- **目的**: Webフロントエンド、顧客・管理者インターフェース
+- **機能**: レスポンシブUI、リアルタイム更新、PWA機能
+- **技術**: モダンWeb技術、WebSocket、Service Worker
+- **インターフェース**: 顧客ポータル、管理ダッシュボード、スタッフインターフェース
 
-## Technology Stack
+## 技術スタック
 
-### Core Technologies
+### コア技術
 
-- **Java 21 LTS** with Virtual Threads and modern language features
-- **Jakarta EE 11** for enterprise functionality
-- **WildFly 31.0.1** as the application server
-- **MicroProfile 6.1** for microservices specifications
+- **Java 21 LTS** - 仮想スレッドとモダン言語機能
+- **Jakarta EE 11** - エンタープライズ機能
+- **WildFly 31.0.1** - アプリケーションサーバー
+- **MicroProfile 6.1** - マイクロサービス仕様
 
-### Database & Persistence
+### データベース・永続化
 
-- **PostgreSQL** for primary data storage
-- **Hibernate 6.4.1** for ORM
-- **Redis** for caching and session storage
-- **H2** for testing
+- **PostgreSQL** - プライマリデータストレージ
+- **Hibernate 6.4.1** - ORM
+- **Redis** - キャッシュとセッションストレージ
+- **H2** - テスト用
 
-### Security
+### セキュリティ
 
-- **JWT** for authentication tokens
-- **BCrypt** for password hashing
-- **HTTPS/TLS** for secure communication
-- **OAuth2/OpenID Connect** for external authentication
+- **JWT** - 認証トークン
+- **BCrypt** - パスワードハッシュ化
+- **HTTPS/TLS** - セキュア通信
+- **OAuth2/OpenID Connect** - 外部認証
 
-### Communication
+### 通信
 
-- **JAX-RS** for REST APIs
-- **WebSocket** for real-time communication
-- **JMS** for asynchronous messaging
-- **gRPC** for high-performance inter-service communication
+- **JAX-RS** - REST API
+- **WebSocket** - リアルタイム通信
+- **JMS** - 非同期メッセージング
+- **gRPC** - 高性能サービス間通信
 
-### Monitoring & Observability
+### 監視・可観測性
 
-- **MicroProfile Health** for health checks
-- **MicroProfile Metrics** for application metrics
-- **MicroProfile OpenTracing** for distributed tracing
-- **Structured logging** with JSON format
+- **MicroProfile Health** - ヘルスチェック
+- **MicroProfile Metrics** - アプリケーションメトリクス
+- **MicroProfile OpenTracing** - 分散トレーシング
+- **構造化ログ** - JSON形式
 
-## Getting Started
+## はじめに
 
-### Prerequisites
+### 前提条件
 
 - Java 21 LTS
 - Maven 3.9+
@@ -142,198 +139,198 @@ The system follows a microservices architecture pattern with the following compo
 - Redis 7+
 - WildFly 31.0.1
 
-### Building the Project
+### プロジェクトのビルド
 
 ```bash
-# Clone the repository
+# リポジトリをクローン
 git clone https://github.com/jakartaone2025/ski-resort-system.git
 cd ski-resort-system/microservices
 
-# Build all services
+# すべてのサービスをビルド
 mvn clean compile
 
-# Run tests
+# テスト実行
 mvn test
 
-# Package all services
+# すべてのサービスをパッケージ化
 mvn package
 ```
 
-### Running Services
+### サービスの実行
 
-#### Option 1: Individual Services
+#### オプション1: 個別サービス
 
 ```bash
-# API Gateway
+# APIゲートウェイ
 cd 01-api-gateway-service
 mvn wildfly:deploy
 
-# User Management
+# ユーザー管理
 cd 02-user-management-service
 mvn wildfly:deploy
 ```
 
-#### Option 2: Docker Compose
+#### オプション2: Docker Compose
 
 ```bash
-# Start all services with dependencies
+# 依存関係を含むすべてのサービスを開始
 docker-compose up -d
 ```
 
-### Service URLs
+### サービスURL
 
-- API Gateway: <http://localhost:8080>
-- User Management: <http://localhost:8081>
-- Product Catalog: <http://localhost:8083>
-- Authentication: <http://localhost:8084>
-- Inventory Management: <http://localhost:8085>
-- Order Management: <http://localhost:8086>
-- Payment Service: <http://localhost:8087>
-- Shopping Cart: <http://localhost:8088>
-- Coupon/Discount: <http://localhost:8089>
-- Points/Loyalty: <http://localhost:8090>
-- AI Support: <http://localhost:8091>
-- Frontend: <http://localhost:8092>
+- APIゲートウェイ: <http://localhost:8080>
+- ユーザー管理: <http://localhost:8081>
+- プロダクトカタログ: <http://localhost:8083>
+- 認証: <http://localhost:8084>
+- 在庫管理: <http://localhost:8085>
+- 注文管理: <http://localhost:8086>
+- 決済サービス: <http://localhost:8087>
+- ショッピングカート: <http://localhost:8088>
+- クーポン・割引: <http://localhost:8089>
+- ポイント・ロイヤルティ: <http://localhost:8090>
+- AIサポート: <http://localhost:8091>
+- フロントエンド: <http://localhost:8092>
 
-## API Documentation
+## API文書
 
-Each service provides OpenAPI documentation accessible at:
+各サービスは以下でOpenAPI文書を提供しています：
 
 - `http://localhost:<port>/<service-name>/api/openapi`
 
-## Configuration
+## 設定
 
-Configuration is managed through MicroProfile Config:
+設定はMicroProfile Configで管理されています：
 
-- **Environment variables** for production deployment
-- **Properties files** for development
-- **Kubernetes ConfigMaps** for container environments
+- **環境変数** - 本番デプロイ用
+- **プロパティファイル** - 開発用
+- **Kubernetes ConfigMaps** - コンテナ環境用
 
-## Database Schema
+## データベーススキーマ
 
-Each service manages its own database schema:
+各サービスは独自のデータベーススキーマを管理しています：
 
-- **User Management**: User profiles, authentication data
-- **Product Catalog**: Products, categories, pricing
-- **Inventory**: Equipment, stock levels, reservations
-- **Orders**: Order history, bookings, fulfillment
-- **Payments**: Transactions, payment methods
-- **Loyalty**: Points, tiers, rewards
+- **ユーザー管理**: ユーザープロファイル、認証データ
+- **プロダクトカタログ**: 商品、カテゴリ、価格設定
+- **在庫**: 設備、在庫レベル、予約
+- **注文**: 注文履歴、予約、フルフィルメント
+- **決済**: 取引、決済方法
+- **ロイヤルティ**: ポイント、ティア、報酬
 
-## Security & Authentication
+## セキュリティ・認証
 
-### Authentication Flow
+### 認証フロー
 
-1. User authenticates via Authentication Service
-2. JWT token issued with user claims
-3. API Gateway validates tokens for all requests
-4. Service-to-service communication uses JWT forwarding
+1. ユーザーが認証サービス経由で認証
+2. ユーザークレーム付きJWTトークンを発行
+3. APIゲートウェイがすべてのリクエストでトークンを検証
+4. サービス間通信はJWT転送を使用
 
-### Authorization
+### 認可
 
-- **Role-based access control (RBAC)**
-- **Resource-level permissions**
-- **API key authentication for service-to-service**
+- **ロールベースアクセス制御（RBAC）**
+- **リソースレベル権限**
+- **サービス間通信用APIキー認証**
 
-## Monitoring
+## 監視
 
-### Health Checks
+### ヘルスチェック
 
-- `/health` - MicroProfile Health endpoint
-- `/health/live` - Liveness probe
-- `/health/ready` - Readiness probe
+- `/health` - MicroProfile Healthエンドポイント
+- `/health/live` - Livenessプローブ
+- `/health/ready` - Readinessプローブ
 
-### Metrics
+### メトリクス
 
-- `/metrics` - Prometheus-compatible metrics
-- Custom business metrics for each service
+- `/metrics` - Prometheus互換メトリクス
+- 各サービス用カスタムビジネスメトリクス
 
-### Logging
+### ログ
 
-- Structured JSON logging
-- Correlation IDs for request tracing
-- Centralized log aggregation
+- 構造化JSONログ
+- リクエストトレーシング用相関ID
+- 集約型ログ収集
 
-## Development Guidelines
+## 開発ガイドライン
 
-### Code Standards
+### コーディング規約
 
-- Java 21 best practices
-- Constructor injection over field injection
-- Comprehensive error handling
-- Unit and integration testing
+- Java 21ベストプラクティス
+- フィールドインジェクションよりコンストラクターインジェクション
+- 包括的エラーハンドリング
+- 単体・統合テスト
 
-### Testing Strategy
+### テスト戦略
 
-- **Unit tests** with JUnit 5 and Mockito
-- **Integration tests** with TestContainers
-- **Contract testing** with Pact
-- **End-to-end testing** with REST Assured
+- **単体テスト** - JUnit 5とMockito
+- **統合テスト** - TestContainers
+- **契約テスト** - Pact
+- **E2Eテスト** - REST Assured
 
-### CI/CD Pipeline
+### CI/CDパイプライン
 
-- **Build**: Maven compilation and testing
-- **Quality**: SonarQube code analysis
-- **Security**: OWASP dependency scanning
-- **Deploy**: Blue-green deployment strategy
+- **ビルド**: Mavenコンパイルとテスト
+- **品質**: SonarQubeコード解析
+- **セキュリティ**: OWASP依存関係スキャン
+- **デプロイ**: ブルーグリーンデプロイ戦略
 
-## Scalability & Performance
+## スケーラビリティ・パフォーマンス
 
-### Horizontal Scaling
+### 水平スケーリング
 
-- Stateless service design
-- Database connection pooling
-- Load balancing with HAProxy/NGINX
+- ステートレスサービス設計
+- データベースコネクションプール
+- HAProxy/NGINXでのロードバランシング
 
-### Caching Strategy
+### キャッシュ戦略
 
-- **Redis** for session and frequently accessed data
-- **CDN** for static content
-- **Application-level** caching with Caffeine
+- **Redis** - セッションと頻繁にアクセスされるデータ
+- **CDN** - 静的コンテンツ
+- **アプリケーションレベル** - Caffeineでのキャッシュ
 
-### Performance Optimization
+### パフォーマンス最適化
 
-- **Java 21 Virtual Threads** for improved concurrency
-- **Connection pooling** for database efficiency
-- **Async processing** for long-running operations
+- **Java 21仮想スレッド** - 同時実行性向上
+- **コネクションプール** - データベース効率化
+- **非同期処理** - 長時間実行オペレーション
 
-## Deployment
+## デプロイ
 
-### Container Strategy
+### コンテナ戦略
 
-- **Docker** containers for each service
-- **Multi-stage builds** for optimized images
-- **Health checks** integrated in containers
+- **Docker** - 各サービス用コンテナ
+- **マルチステージビルド** - 最適化されたイメージ
+- **ヘルスチェック** - コンテナに統合
 
 ### Kubernetes
 
-- **Helm charts** for deployment templates
-- **ConfigMaps** for configuration management
-- **Secrets** for sensitive data
-- **Ingress** for external access
+- **Helmチャート** - デプロイテンプレート
+- **ConfigMaps** - 設定管理
+- **Secrets** - 機密データ
+- **Ingress** - 外部アクセス
 
-### Monitoring in Production
+### 本番環境での監視
 
-- **Prometheus** for metrics collection
-- **Grafana** for dashboards
-- **ELK Stack** for log analysis
-- **Jaeger** for distributed tracing
+- **Prometheus** - メトリクス収集
+- **Grafana** - ダッシュボード
+- **ELKスタック** - ログ解析
+- **Jaeger** - 分散トレーシング
 
-## Contributing
+## 貢献方法
 
-1. Fork the repository
-2. Create a feature branch
-3. Implement changes with tests
-4. Submit a pull request
+1. リポジトリをフォーク
+2. フィーチャーブランチを作成
+3. テスト付きで変更を実装
+4. プルリクエストを提出
 
-## License
+## ライセンス
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+このプロジェクトはMITライセンスの下でライセンスされています - 詳細はLICENSEファイルを参照してください。
 
-## Support
+## サポート
 
-For questions and support:
+質問やサポートについては：
 
-- **Documentation**: [Wiki](https://github.com/jakartaone2025/ski-resort-system/wiki)
+- **文書**: [Wiki](https://github.com/jakartaone2025/ski-resort-system/wiki)
 - **Issues**: [GitHub Issues](https://github.com/jakartaone2025/ski-resort-system/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/jakartaone2025/ski-resort-system/discussions)
+- **ディスカッション**: [GitHub Discussions](https://github.com/jakartaone2025/ski-resort-system/discussions)

@@ -1,90 +1,90 @@
-# API Gateway Service
+# APIゲートウェイサービス
 
-This is the central API Gateway for the Ski Resort Management System. It provides routing, authentication, rate limiting, and other cross-cutting concerns for all microservices.
+これはスキーリゾート管理システムの中央APIゲートウェイです。すべてのマイクロサービスに対して、ルーティング、認証、レート制限、その他の横断的関心事を提供します。
 
-## Features
+## 機能
 
-- **Request Routing**: Routes incoming requests to appropriate downstream microservices
-- **Authentication**: JWT token validation and user context extraction
-- **Rate Limiting**: Per-client request rate limiting with configurable limits
-- **Health Monitoring**: Health checks for all downstream services
-- **CORS Support**: Cross-Origin Resource Sharing configuration
-- **Service Discovery**: Dynamic routing based on service availability
+- **リクエストルーティング**: 受信リクエストを適切な下流マイクロサービスにルーティング
+- **認証**: JWTトークン検証とユーザーコンテキスト抽出
+- **レート制限**: 設定可能な制限によるクライアント毎のリクエストレート制限
+- **ヘルス監視**: すべての下流サービスのヘルスチェック
+- **CORSサポート**: クロスオリジンリソース共有設定
+- **サービス発見**: サービス可用性に基づく動的ルーティング
 
-## Technology Stack
+## 技術スタック
 
 - Jakarta EE 11
-- Java 21 LTS with Virtual Threads
-- WildFly 31.0.1 Application Server
-- MicroProfile 6.1 (Config, Health, Metrics, OpenAPI)
-- JWT (JSON Web Tokens) for authentication
-- Maven for build management
+- Java 21 LTS（仮想スレッド対応）
+- WildFly 31.0.1 アプリケーションサーバー
+- MicroProfile 6.1（Config, Health, Metrics, OpenAPI）
+- JWT（JSON Web Tokens）認証
+- Maven ビルド管理
 
-## Configuration
+## 設定
 
-Configuration is managed through MicroProfile Config in `META-INF/microprofile-config.properties`:
+設定は`META-INF/microprofile-config.properties`のMicroProfile Configで管理されています：
 
 ```properties
-# Server Configuration
+# サーバー設定
 server.host=0.0.0.0
 server.port=8080
 
-# JWT Configuration
+# JWT設定
 jwt.secret=your-256-bit-secret-key
 jwt.expiration.hours=24
 
-# Rate Limiting
+# レート制限
 gateway.ratelimit.default.requests=100
 gateway.ratelimit.auth.requests=200
 gateway.ratelimit.window.seconds=60
 
-# Service URLs
+# サービスURL
 services.user.url=http://localhost:8081
 services.product.url=http://localhost:8082
-# ... other services
+# ... その他のサービス
 ```
 
-## API Routes
+## APIルート
 
-The gateway routes requests based on path prefixes:
+ゲートウェイはパスプレフィックスに基づいてリクエストをルーティングします：
 
-- `/users/*` → User Management Service (port 8081)
-- `/api/v1/products/*` → Product Catalog Service (port 8083)
-- `/api/v1/categories/*` → Product Catalog Service (port 8083)
-- `/products/*` → Product Catalog Service (port 8083) (deprecated path)
-- `/categories/*` → Product Catalog Service (port 8083) (deprecated path)
-- `/auth/*` → Authentication Service (port 8084)
-- `/inventory/*` → Inventory Management Service (port 8085)
-- `/orders/*` → Order Management Service (port 8086)
-- `/payments/*` → Payment Service (port 8087)
-- `/cart/*` → Shopping Cart Service (port 8088)
-- `/coupons/*`, `/discounts/*` → Coupon/Discount Service (port 8089)
-- `/points/*`, `/loyalty/*` → Points/Loyalty Service (port 8090)
-- `/ai/*`, `/support/*` → AI Support Service (port 8091)
+- `/users/*` → ユーザー管理サービス (port 8081)
+- `/api/v1/products/*` → プロダクトカタログサービス (port 8083)
+- `/api/v1/categories/*` → プロダクトカタログサービス (port 8083)
+- `/products/*` → プロダクトカタログサービス (port 8083)（非推奨パス）
+- `/categories/*` → プロダクトカタログサービス (port 8083)（非推奨パス）
+- `/auth/*` → 認証サービス (port 8084)
+- `/inventory/*` → 在庫管理サービス (port 8085)
+- `/orders/*` → 注文管理サービス (port 8086)
+- `/payments/*` → 決済サービス (port 8087)
+- `/cart/*` → ショッピングカートサービス (port 8088)
+- `/coupons/*`, `/discounts/*` → クーポン・割引サービス (port 8089)
+- `/points/*`, `/loyalty/*` → ポイント・ロイヤルティサービス (port 8090)
+- `/ai/*`, `/support/*` → AIサポートサービス (port 8091)
 
-## Rate Limiting
+## レート制限
 
-Rate limiting is implemented with the following features:
+レート制限は以下の機能で実装されています：
 
-- Per-client tracking (by user ID or IP address)
-- Configurable limits per endpoint category
-- Sliding window algorithm
-- Rate limit headers in responses
+- クライアント毎の追跡（ユーザーIDまたはIPアドレス）
+- エンドポイントカテゴリ毎の設定可能な制限
+- スライディングウィンドウアルゴリズム
+- レスポンスのレート制限ヘッダー
 
-## Authentication
+## 認証
 
-JWT-based authentication with:
+JWT認証は以下を含みます：
 
-- Token validation on protected endpoints
-- User context extraction and forwarding
-- Public endpoints (health checks, auth endpoints)
-- Authorization header forwarding to downstream services
+- 保護されたエンドポイントでのトークン検証
+- ユーザーコンテキスト抽出と転送
+- パブリックエンドポイント（ヘルスチェック、認証エンドポイント）
+- 下流サービスへの認証ヘッダー転送
 
-## Product Catalog Service Endpoints
+## プロダクトカタログサービスエンドポイント
 
-The API Gateway routes the following Product Catalog Service endpoints:
+APIゲートウェイは以下のプロダクトカタログサービスエンドポイントをルーティングします：
 
-### Category Management (10 endpoints)
+### カテゴリ管理（10エンドポイント）
 
 - `GET /api/v1/categories` - 全カテゴリ一覧取得
 - `GET /api/v1/categories/root` - ルートカテゴリ一覧取得
@@ -97,7 +97,7 @@ The API Gateway routes the following Product Catalog Service endpoints:
 - `GET /api/v1/categories/{categoryId}/products` - カテゴリの商品一覧取得
 - `GET /api/v1/categories/{categoryId}/subcategories/products` - サブカテゴリ毎の商品一覧取得
 
-### Product Management (9 endpoints)
+### 商品管理（9エンドポイント）
 
 - `GET /api/v1/products` - 商品一覧・検索
 - `GET /api/v1/products/featured` - 注目商品一覧
@@ -109,57 +109,57 @@ The API Gateway routes the following Product Catalog Service endpoints:
 - `PUT /api/v1/products/{productId}` - 商品更新
 - `DELETE /api/v1/products/{productId}` - 商品削除
 
-### System Endpoints
+### システムエンドポイント
 
 - `GET /q/health` - ヘルスチェック
 - `GET /q/openapi` - OpenAPI仕様書取得
 
-## Health Checks
+## ヘルスチェック
 
-Multiple health check endpoints:
+複数のヘルスチェックエンドポイント：
 
-- `/health` - MicroProfile Health checks
-- `/health/services` - Detailed status of all downstream services
-- Liveness and Readiness probes
+- `/health` - MicroProfile Healthチェック
+- `/health/services` - すべての下流サービスの詳細ステータス
+- LivenessとReadinessプローブ
 
-## Building and Running
+## ビルドと実行
 
 ```bash
-# Build the project
+# プロジェクトをビルド
 mvn clean compile
 
-# Run tests
+# テスト実行
 mvn test
 
-# Package WAR file
+# WARファイルをパッケージ化
 mvn package
 
-# Deploy to WildFly
+# WildFlyにデプロイ
 mvn wildfly:deploy
 ```
 
-## Development
+## 開発
 
-The service includes comprehensive unit tests and follows Jakarta EE best practices:
+サービスには包括的な単体テストが含まれており、Jakarta EEのベストプラクティスに従っています：
 
-- Constructor injection instead of field injection
-- Proper exception handling and logging
-- Configurable timeouts and retry logic
-- Clean separation of concerns
+- フィールドインジェクションではなくコンストラクターインジェクション
+- 適切な例外処理とログ記録
+- 設定可能なタイムアウトとリトライロジック
+- 関心事の明確な分離
 
-## Monitoring
+## 監視
 
-The gateway provides metrics and monitoring through:
+ゲートウェイは以下による メトリクスと監視を提供します：
 
 - MicroProfile Metrics
-- Structured logging
-- Service health tracking
-- Request/response timing
+- 構造化ログ
+- サービスヘルス追跡
+- リクエスト/レスポンス時間測定
 
-## Security Considerations
+## セキュリティ考慮事項
 
-- JWT secret key must be changed in production
-- HTTPS should be enforced in production
-- Rate limiting helps prevent abuse
-- Input validation on all proxied requests
-- Proper CORS configuration for web clients
+- JWTシークレットキーは本番環境で変更必須
+- 本番環境ではHTTPSを強制すべき
+- レート制限により悪用を防止
+- プロキシされるすべてのリクエストでの入力検証
+- Webクライアント用の適切なCORS設定

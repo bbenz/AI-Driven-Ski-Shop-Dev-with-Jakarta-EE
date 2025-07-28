@@ -2,11 +2,7 @@
 
 # 動作確認ビデオ
 
-<video width="640" controls>
-<source src="https://flic.kr/p/2rjkFZi" type="video/mp4">
-Your browser does not support the video tag
-</video>
-
+[▶️ 動作確認ビデオを見る](https://flic.kr/p/2rjkFZi)
 
 ## 📖 プロジェクト概要
 

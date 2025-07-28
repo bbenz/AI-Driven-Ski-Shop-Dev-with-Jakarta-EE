@@ -1,95 +1,104 @@
-# Shopping Cart Service
+# ショッピングカートサービス
 
-Quarkus-based microservice for managing shopping cart functionality in the ski equipment e-commerce platform.
+スキー用品Eコマースプラットフォームでショッピングカート機能を管理するQuarkusベースのマイクロサービスです。
 
-## Features
+## 機能
 
-- **Cart Management**: Create, update, and manage shopping carts
-- **Item Operations**: Add, remove, and update item quantities
-- **Session Support**: Guest cart management with session tracking
-- **Cart Merging**: Merge guest carts with user carts on login
-- **Real-time Updates**: WebSocket support for live cart updates
-- **Caching**: Redis-based caching for improved performance
-- **Event-driven**: Kafka integration for microservice communication
-- **Resilience**: Circuit breaker, retry, and fallback patterns
-- **Monitoring**: Prometheus metrics and distributed tracing
+- **カート管理**: ショッピングカートの作成、更新、管理
+- **商品操作**: 商品の追加、削除、数量更新
+- **セッションサポート**: セッション追跡によるゲストカート管理
+- **カートマージ**: ログイン時のゲストカートとユーザーカートの統合
+- **リアルタイム更新**: ライブカート更新用WebSocketサポート
+- **キャッシュ**: パフォーマンス向上のためのRedisベースキャッシュ
+- **イベント駆動**: マイクロサービス通信用Kafka統合
+- **レジリエンス**: サーキットブレーカー、リトライ、フォールバックパターン
+- **監視**: Prometheusメトリクスと分散トレーシング
 
-## Technology Stack
+## 技術スタック
 
-- **Framework**: Quarkus 3.15.1 with Jakarta EE 11
-- **Runtime**: Java 21 LTS
-- **Database**: PostgreSQL 16 with Flyway migrations
-- **Cache**: Redis 7.2
-- **Messaging**: Apache Kafka
-- **Monitoring**: Prometheus, Jaeger tracing
-- **API**: REST with OpenAPI documentation
-- **Real-time**: WebSocket endpoints
+- **フレームワーク**: Quarkus 3.15.1（Jakarta EE 11対応）
+- **ランタイム**: Java 21 LTS
+- **データベース**: PostgreSQL 16（Flyway マイグレーション）
+- **キャッシュ**: Redis 7.2
+- **メッセージング**: Apache Kafka
+- **監視**: Prometheus、Jaeger トレーシング
+- **API**: OpenAPI文書付きREST
+- **リアルタイム**: WebSocket エンドポイント
 
-## Quick Start
+## クイックスタート
 
-### Prerequisites
+### 前提条件
 
 - Java 21 LTS
 - Maven 3.9+
-- Docker and Docker Compose
+- Docker と Docker Compose
 
-### Development Mode
+### 開発モード
 
-1. Start infrastructure services:
+1. インフラストラクチャサービスを開始：
+
 ```bash
 docker-compose up -d postgres redis kafka zookeeper
 ```
 
-2. Run the application in dev mode:
+1. 開発モードでアプリケーションを実行：
+
 ```bash
 ./mvnw quarkus:dev
 ```
 
-The service will be available at:
-- **API**: http://localhost:8088
-- **Swagger UI**: http://localhost:8088/swagger-ui
-- **Health Check**: http://localhost:8088/q/health
-- **Metrics**: http://localhost:8088/metrics
+サービスは以下で利用可能です：
 
-### Production Mode
+- **API**: <http://localhost:8088>
+- **Swagger UI**: <http://localhost:8088/swagger-ui>
+- **ヘルスチェック**: <http://localhost:8088/q/health>
+- **メトリクス**: <http://localhost:8088/metrics>
 
-1. Build and run with Docker Compose:
+### 本番モード
+
+1. Docker Composeでビルドして実行：
+
 ```bash
 docker-compose up --build
 ```
 
-2. Or build JAR and run:
+1. またはJARファイルをビルドして実行：
+
 ```bash
 ./mvnw clean package
 java -jar target/shopping-cart-service-1.0.0-SNAPSHOT-runner.jar
 ```
 
-## API Endpoints
+## APIエンドポイント
 
-### Cart Management
-- `GET /api/v1/carts/{cartId}` - Get cart by ID
-- `GET /api/v1/carts/session/{sessionId}` - Get/create cart by session
-- `GET /api/v1/carts/customer/{customerId}` - Get/create cart by customer
+### カート管理
 
-### Item Operations
-- `POST /api/v1/carts/{cartId}/items` - Add item to cart
-- `PUT /api/v1/carts/{cartId}/items/{sku}/quantity` - Update item quantity
-- `DELETE /api/v1/carts/{cartId}/items/{sku}` - Remove item
-- `DELETE /api/v1/carts/{cartId}/items` - Clear cart
+- `GET /api/v1/carts/{cartId}` - IDでカートを取得
+- `GET /api/v1/carts/session/{sessionId}` - セッションでカートを取得/作成
+- `GET /api/v1/carts/customer/{customerId}` - 顧客でカートを取得/作成
 
-### Advanced Operations
-- `POST /api/v1/carts/{guestCartId}/merge/{customerId}` - Merge guest cart
-- `POST /api/v1/carts/{cartId}/validate` - Validate cart
+### 商品操作
+
+- `POST /api/v1/carts/{cartId}/items` - カートに商品を追加
+- `PUT /api/v1/carts/{cartId}/items/{sku}/quantity` - 商品数量を更新
+- `DELETE /api/v1/carts/{cartId}/items/{sku}` - 商品を削除
+- `DELETE /api/v1/carts/{cartId}/items` - カートをクリア
+
+### 高度な操作
+
+- `POST /api/v1/carts/{guestCartId}/merge/{customerId}` - ゲストカートをマージ
+- `POST /api/v1/carts/{cartId}/validate` - カートを検証
 
 ### WebSocket
-- `WS /api/v1/carts/ws/{cartId}` - Real-time cart updates
 
-## Configuration
+- `WS /api/v1/carts/ws/{cartId}` - リアルタイムカート更新
 
-Key configuration properties in `application.properties`:
+## 設定
+
+`application.properties`の主要設定プロパティ：
 
 ```properties
-# Database
+# データベース
 quarkus.datasource.jdbc.url=jdbc:postgresql://localhost:5433/cartdb
 quarkus.datasource.username=cartuser
 quarkus.datasource.password=cartpass
@@ -100,188 +109,204 @@ quarkus.redis.hosts=redis://localhost:6379
 # Kafka
 kafka.bootstrap.servers=localhost:9092
 
-# External Services
+# 外部サービス
 quarkus.rest-client.product-catalog-service.url=http://localhost:8081
 quarkus.rest-client.inventory-management-service.url=http://localhost:8082
 ```
 
-## Database Schema
+## データベーススキーマ
 
-The service uses PostgreSQL with the following main tables:
+サービスは以下の主要テーブルでPostgreSQLを使用します：
 
-- `shopping_carts` - Cart metadata and totals
-- `cart_items` - Individual cart items
-- `applied_coupons` - Applied discounts and coupons
-- `cart_events` - Event sourcing for cart activities
+- `shopping_carts` - カートメタデータと合計
+- `cart_items` - 個別カート商品
+- `applied_coupons` - 適用された割引とクーポン
+- `cart_events` - カートアクティビティのイベントソーシング
 
-Migrations are managed by Flyway and located in `src/main/resources/db/migration/`.
+マイグレーションはFlywayで管理され、`src/main/resources/db/migration/`に配置されています。
 
-## Event Integration
+## イベント統合
 
-### Published Events
-- `CartCreatedEvent` - When a new cart is created
-- `CartItemAddedEvent` - When items are added
-- `CartItemRemovedEvent` - When items are removed
-- `CartItemQuantityUpdatedEvent` - When quantities change
-- `CartMergedEvent` - When carts are merged
-- `CartCheckedOutEvent` - When checkout is initiated
+### パブリッシュされるイベント
 
-### Consumed Events
-- Product price updates from Product Catalog Service
-- Inventory changes from Inventory Management Service
-- User profile updates from User Management Service
+- `CartCreatedEvent` - 新しいカートが作成された時
+- `CartItemAddedEvent` - 商品が追加された時
+- `CartItemRemovedEvent` - 商品が削除された時
+- `CartItemQuantityUpdatedEvent` - 数量が変更された時
+- `CartMergedEvent` - カートがマージされた時
+- `CartCheckedOutEvent` - チェックアウトが開始された時
 
-## Monitoring and Observability
+### 消費されるイベント
 
-### Health Checks
+- プロダクトカタログサービスからの商品価格更新
+- 在庫管理サービスからの在庫変更
+- ユーザー管理サービスからのユーザープロファイル更新
+
+## 監視と可観測性
+
+### ヘルスチェック
+
 - **Liveness**: `/q/health/live`
 - **Readiness**: `/q/health/ready`
 
-### Metrics
+### メトリクス
+
 - **Prometheus**: `/metrics`
-- Custom cart-specific metrics for:
-  - Cart creation rate
-  - Item addition/removal rates
-  - Cache hit ratios
-  - WebSocket connection counts
+- カート固有のカスタムメトリクス：
+  - カート作成率
+  - 商品追加/削除率
+  - キャッシュヒット率
+  - WebSocket接続数
 
-### Distributed Tracing
-- **Jaeger**: Automatic trace collection for all requests
-- Custom spans for external service calls
-- Correlation across microservices
+### 分散トレーシング
 
-## Cache Strategy
+- **Jaeger**: すべてのリクエストの自動トレース収集
+- 外部サービス呼び出し用のカスタムスパン
+- マイクロサービス間の相関関係
 
-Redis is used for:
-- **Cart Summaries**: Frequently accessed cart data (1 hour TTL)
-- **Session Mapping**: Guest cart to session mapping (8 hour TTL)
-- **Temporary Operations**: Concurrent operation locking (1 minute TTL)
+## キャッシュ戦略
 
-## Resilience Patterns
+Redisは以下の用途で使用されます：
 
-- **Circuit Breaker**: Protects against external service failures
-- **Retry**: Automatic retry for transient failures
-- **Fallback**: Graceful degradation when services are unavailable
-- **Timeout**: Prevents hanging requests
+- **カートサマリー**: 頻繁にアクセスされるカートデータ（1時間TTL）
+- **セッションマッピング**: ゲストカートからセッションへのマッピング（8時間TTL）
+- **一時操作**: 同時操作ロック（1分TTL）
 
-## Testing
+## レジリエンスパターン
 
-### Unit Tests
+- **サーキットブレーカー**: 外部サービス障害からの保護
+- **リトライ**: 一時的障害の自動リトライ
+- **フォールバック**: サービス利用不可時の適切な機能低下
+- **タイムアウト**: ハングリクエストの防止
+
+## テスト
+
+### 単体テスト
+
 ```bash
 ./mvnw test
 ```
 
-### Integration Tests
+### 統合テスト
+
 ```bash
 ./mvnw verify
 ```
 
-### Test Containers
-Integration tests use Testcontainers for:
-- PostgreSQL database
-- Redis cache
-- Kafka messaging
+### TestContainers
 
-## Container Deployment
+統合テストは以下のTestContainersを使用：
 
-### Docker Build
+- PostgreSQL データベース
+- Redis キャッシュ
+- Kafka メッセージング
+
+## コンテナデプロイメント
+
+### Docker ビルド
+
 ```bash
 docker build -t shopping-cart-service .
 ```
 
-### Native Build (GraalVM)
+### ネイティブビルド（GraalVM）
+
 ```bash
 ./mvnw package -Pnative -Dquarkus.native.container-build=true
 docker build -f Dockerfile.native -t shopping-cart-service:native .
 ```
 
-## External Service Integration
+## 外部サービス統合
 
-The service integrates with:
+サービスは以下と統合します：
 
-1. **Product Catalog Service** (port 8081)
-   - Product validation and pricing
-   - Product availability checks
+1. **プロダクトカタログサービス**（port 8081）
+   - 商品検証と価格設定
+   - 商品在庫状況チェック
 
-2. **Inventory Management Service** (port 8082)
-   - Stock availability verification
-   - Inventory reservation
+2. **在庫管理サービス**（port 8082）
+   - 在庫状況確認
+   - 在庫予約
 
-3. **User Management Service** (port 8083)
-   - User authentication and authorization
-   - User profile information
+3. **ユーザー管理サービス**（port 8083）
+   - ユーザー認証と認可
+   - ユーザープロファイル情報
 
-4. **API Gateway Service** (port 8080)
-   - Request routing and load balancing
-   - Authentication and rate limiting
+4. **APIゲートウェイサービス**（port 8080）
+   - リクエストルーティングとロードバランシング
+   - 認証とレート制限
 
-## Development
+## 開発
 
-### Dev Mode Features
-- **Live Reload**: Automatic restart on code changes
-- **Dev UI**: Available at `/q/dev`
-- **H2 Console**: Database inspection in dev mode
-- **Debug Logging**: Enhanced logging for development
+### 開発モード機能
 
-### Code Structure
-```
+- **ライブリロード**: コード変更時の自動再起動
+- **開発UI**: `/q/dev`で利用可能
+- **H2コンソール**: 開発モードでのデータベース検査
+- **デバッグログ**: 開発用の詳細ログ
+
+### コード構造
+
+```text
 src/main/java/com/skishop/cart/
-├── entity/          # JPA entities
-├── dto/             # Data transfer objects
-├── resource/        # REST endpoints
-├── service/         # Business logic
-├── event/           # Event definitions
-├── exception/       # Custom exceptions
-└── health/          # Health check implementations
+├── entity/          # JPA エンティティ
+├── dto/             # データ転送オブジェクト
+├── resource/        # REST エンドポイント
+├── service/         # ビジネスロジック
+├── event/           # イベント定義
+├── exception/       # カスタム例外
+└── health/          # ヘルスチェック実装
 ```
 
-## Troubleshooting
+## トラブルシューティング
 
-### Common Issues
+### よくある問題
 
-1. **Database Connection Issues**
-   - Verify PostgreSQL is running
-   - Check connection parameters
-   - Review Flyway migration logs
+1. **データベース接続問題**
+   - PostgreSQLが動作していることを確認
+   - 接続パラメータをチェック
+   - Flywayマイグレーションログを確認
 
-2. **Redis Connection Issues**
-   - Ensure Redis is accessible
-   - Check Redis configuration
-   - Verify network connectivity
+2. **Redis接続問題**
+   - Redisがアクセス可能であることを確認
+   - Redis設定をチェック
+   - ネットワーク接続を確認
 
-3. **Kafka Issues**
-   - Confirm Kafka and Zookeeper are running
-   - Check topic creation
-   - Review consumer group configurations
+3. **Kafka問題**
+   - KafkaとZookeeperが動作していることを確認
+   - トピック作成をチェック
+   - コンシューマーグループ設定を確認
 
-### Logs
-Application logs include:
-- Request/response details
-- Cache operations
-- Event publishing/consumption
-- External service calls
-- Error traces with correlation IDs
+### ログ
 
-## Performance Considerations
+アプリケーションログには以下が含まれます：
 
-- **Async Processing**: CompletableFuture for non-blocking operations
-- **Connection Pooling**: Optimized database and Redis connections
-- **Caching Strategy**: Multi-level caching for frequently accessed data
-- **Event Streaming**: Kafka for decoupled, scalable communication
-- **Resource Limits**: Configured JVM and container limits
+- リクエスト/レスポンス詳細
+- キャッシュ操作
+- イベントパブリッシュ/消費
+- 外部サービス呼び出し
+- 相関IDを含むエラートレース
 
-## Security
+## パフォーマンス考慮事項
 
-- **JWT Authentication**: Support for Bearer token authentication
-- **Input Validation**: Jakarta Validation for all request parameters
-- **SQL Injection Prevention**: Parameterized queries with JPA
-- **CORS Support**: Configurable cross-origin resource sharing
+- **非同期処理**: ノンブロッキング操作用のCompletableFuture
+- **コネクションプール**: データベースとRedis接続の最適化
+- **キャッシュ戦略**: 頻繁にアクセスされるデータの多層キャッシュ
+- **イベントストリーミング**: 疎結合でスケーラブルな通信用Kafka
+- **リソース制限**: JVMとコンテナの制限設定
 
-## Future Enhancements
+## セキュリティ
 
-- [ ] Cart recommendation engine integration
-- [ ] Advanced caching strategies (multi-region)
-- [ ] Machine learning for cart abandonment prediction
-- [ ] Enhanced real-time analytics
-- [ ] GraphQL API support
-- [ ] Advanced security features (OAuth2, rate limiting)
+- **JWT認証**: Bearerトークン認証のサポート
+- **入力検証**: すべてのリクエストパラメータのJakarta Validation
+- **SQLインジェクション防止**: JPAでのパラメータ化クエリ
+- **CORSサポート**: 設定可能なクロスオリジンリソース共有
+
+## 今後の拡張
+
+- [ ] カート推奨エンジン統合
+- [ ] 高度なキャッシュ戦略（マルチリージョン）
+- [ ] カート放棄予測の機械学習
+- [ ] 拡張リアルタイムアナリティクス
+- [ ] GraphQL API サポート
+- [ ] 高度なセキュリティ機能（OAuth2、レート制限）
