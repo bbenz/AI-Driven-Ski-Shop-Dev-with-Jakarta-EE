@@ -1,5 +1,13 @@
 # スキーリゾート管理システム - マイクロサービスアーキテクチャ
 
+# 動作確認ビデオ
+
+<video width="640" controls>
+<source src="https://flic.kr/p/2rjkFZi" type="video/mp4">
+Your browser does not support the video tag
+</video>
+
+
 ## 📖 プロジェクト概要
 
 このプロジェクトは、Jakarta EE 11、Java 21 LTS、そして最新のマイクロサービスアーキテクチャを使用して構築された包括的なスキーリゾート管理システムです。スキーリゾートの運営に必要なすべての機能（ユーザー管理、設備レンタル、リフト券、レッスン、支払い、カスタマーサポート）を提供します。
