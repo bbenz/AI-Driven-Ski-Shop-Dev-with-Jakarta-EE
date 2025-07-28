@@ -4,7 +4,7 @@
 /node_modules
 /.pnp
 .pnp.*
-.yarn/*
+.yarn/
 !.yarn/patches
 !.yarn/plugins
 !.yarn/releases
@@ -14,11 +14,12 @@
 /coverage
 
 # next.js
-.next/
+/.next/
 /out/
 
 # production
 /build
+/dist
 
 # misc
 .DS_Store
@@ -30,7 +31,7 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
+# local env files
 .env*
 !.env.example
 
@@ -41,19 +42,14 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# Credentials and secrets
-secrets/
-*.key
-*.pem
-**/application-prod.properties
-
-# Java
-target/
-*.class
-*.jar
-*.war
-*.ear
-*.iml
-
-# VS Code
+# IDE
 .vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+Thumbs.db
+
+# Sentry
+.sentryclirc

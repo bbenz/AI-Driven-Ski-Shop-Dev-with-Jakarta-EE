@@ -1,0 +1,6 @@
+<svg width="400" height="300" xmlns="http://www.w3.org/2000/svg">
+  <rect width="400" height="300" fill="#f3e5f5"/>
+  <rect x="50" y="50" width="300" height="200" fill="#7b1fa2" rx="10"/>
+  <text x="200" y="140" text-anchor="middle" fill="white" font-size="16" font-family="Arial">スキーブーツ</text>
+  <text x="200" y="160" text-anchor="middle" fill="white" font-size="12" font-family="Arial">Ski Boots</text>
+</svg>
