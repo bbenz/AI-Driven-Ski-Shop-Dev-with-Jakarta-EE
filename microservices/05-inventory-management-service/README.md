@@ -142,16 +142,24 @@
 ### PostgreSQL設定
 
 ```sql
--- 設備マスタテーブル
+-- 設備マスタテーブル（商品カタログサービスと連携）
 CREATE TABLE equipment (
     id BIGSERIAL PRIMARY KEY,
+    product_id UUID NOT NULL, -- 商品カタログサービスとの連携
+    sku VARCHAR(100) NOT NULL UNIQUE,
     name VARCHAR(200) NOT NULL,
-    category VARCHAR(50) NOT NULL,
-    brand VARCHAR(100),
+    category VARCHAR(100) NOT NULL,
+    brand VARCHAR(100) NOT NULL,
+    equipment_type VARCHAR(50) NOT NULL, -- SKI_BOARD, BOOT, HELMET, etc.
     size_range VARCHAR(50),
-    skill_level VARCHAR(20),
-    daily_rate DECIMAL(10,2),
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    difficulty_level VARCHAR(20),
+    daily_rate DECIMAL(10,2) NOT NULL,
+    description TEXT,
+    image_url VARCHAR(500),
+    is_rental_available BOOLEAN NOT NULL DEFAULT TRUE,
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 -- 在庫アイテムテーブル
@@ -159,12 +167,17 @@ CREATE TABLE inventory_items (
     id BIGSERIAL PRIMARY KEY,
     equipment_id BIGINT NOT NULL REFERENCES equipment(id),
     serial_number VARCHAR(100) UNIQUE,
-    status VARCHAR(20) NOT NULL DEFAULT 'AVAILABLE',
-    location VARCHAR(100),
+    status VARCHAR(20) NOT NULL DEFAULT 'AVAILABLE', -- AVAILABLE, RENTED, MAINTENANCE, RETIRED
+    location VARCHAR(100) NOT NULL DEFAULT 'MAIN_STORE',
     size VARCHAR(20),
-    condition_rating INTEGER DEFAULT 5,
+    condition_rating INTEGER DEFAULT 5 CHECK (condition_rating >= 1 AND condition_rating <= 5),
+    purchase_date DATE,
     last_maintenance_date DATE,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    next_maintenance_date DATE,
+    total_rental_count INTEGER DEFAULT 0,
+    notes TEXT,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 -- 予約テーブル
@@ -175,8 +188,90 @@ CREATE TABLE reservations (
     inventory_item_id BIGINT REFERENCES inventory_items(id),
     start_date TIMESTAMP NOT NULL,
     end_date TIMESTAMP NOT NULL,
-    status VARCHAR(20) NOT NULL DEFAULT 'PENDING',
+    status VARCHAR(20) NOT NULL DEFAULT 'PENDING', -- PENDING, CONFIRMED, ACTIVE, COMPLETED, CANCELLED
     total_amount DECIMAL(10,2),
+    deposit_amount DECIMAL(10,2),
+    size_requested VARCHAR(20),
+    special_requests TEXT,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    confirmed_at TIMESTAMP,
+    completed_at TIMESTAMP,
+    cancelled_at TIMESTAMP
+);
+
+-- 在庫移動履歴テーブル
+CREATE TABLE inventory_movements (
+    id BIGSERIAL PRIMARY KEY,
+    inventory_item_id BIGINT NOT NULL REFERENCES inventory_items(id),
+    movement_type VARCHAR(20) NOT NULL, -- RENTAL, RETURN, MAINTENANCE, TRANSFER, PURCHASE, RETIRE
+    from_location VARCHAR(100),
+    to_location VARCHAR(100),
+    from_status VARCHAR(20),
+    to_status VARCHAR(20),
+    customer_id BIGINT,
+    reservation_id BIGINT REFERENCES reservations(id),
+    notes TEXT,
+    movement_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    processed_by VARCHAR(100)
+);
+
+-- メンテナンス記録テーブル
+CREATE TABLE maintenance_records (
+    id BIGSERIAL PRIMARY KEY,
+    inventory_item_id BIGINT NOT NULL REFERENCES inventory_items(id),
+    maintenance_type VARCHAR(50) NOT NULL, -- ROUTINE, REPAIR, REPLACEMENT, INSPECTION
+    description TEXT NOT NULL,
+    maintenance_date DATE NOT NULL,
+    performed_by VARCHAR(100),
+    cost DECIMAL(10,2),
+    parts_replaced TEXT,
+    condition_before INTEGER CHECK (condition_before >= 1 AND condition_before <= 5),
+    condition_after INTEGER CHECK (condition_after >= 1 AND condition_after <= 5),
+    next_maintenance_date DATE,
+    is_completed BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 在庫統計テーブル（サマリー情報）
+CREATE TABLE inventory_summary (
+    id BIGSERIAL PRIMARY KEY,
+    equipment_id BIGINT NOT NULL REFERENCES equipment(id),
+    location VARCHAR(100) NOT NULL,
+    total_count INTEGER NOT NULL DEFAULT 0,
+    available_count INTEGER NOT NULL DEFAULT 0,
+    rented_count INTEGER NOT NULL DEFAULT 0,
+    maintenance_count INTEGER NOT NULL DEFAULT 0,
+    retired_count INTEGER NOT NULL DEFAULT 0,
+    last_updated TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(equipment_id, location)
+);
+
+-- 店舗・倉庫マスタテーブル
+CREATE TABLE locations (
+    id BIGSERIAL PRIMARY KEY,
+    code VARCHAR(50) NOT NULL UNIQUE,
+    name VARCHAR(200) NOT NULL,
+    location_type VARCHAR(20) NOT NULL, -- STORE, WAREHOUSE, REPAIR_SHOP
+    address TEXT,
+    phone VARCHAR(20),
+    manager_name VARCHAR(100),
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 在庫アラートテーブル
+CREATE TABLE inventory_alerts (
+    id BIGSERIAL PRIMARY KEY,
+    equipment_id BIGINT NOT NULL REFERENCES equipment(id),
+    location VARCHAR(100) NOT NULL,
+    alert_type VARCHAR(20) NOT NULL, -- LOW_STOCK, NO_STOCK, MAINTENANCE_DUE, HIGH_DEMAND
+    severity VARCHAR(10) NOT NULL, -- LOW, MEDIUM, HIGH, CRITICAL
+    message TEXT NOT NULL,
+    current_count INTEGER,
+    threshold_count INTEGER,
+    is_resolved BOOLEAN NOT NULL DEFAULT FALSE,
+    resolved_at TIMESTAMP,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 ```
@@ -326,13 +421,71 @@ curl -X PUT http://localhost:8084/inventory/items/item-12345/status \
    - キャッシュヒット率の確認
    - クエリ最適化
 
-## 今後の拡張予定
+## 作成済みデータ概要
 
-- [ ] AI による需要予測
-- [ ] IoT センサー統合
-- [ ] 自動メンテナンススケジュール
-- [ ] モバイルアプリ対応
-- [ ] RFID タグ管理
+### 設備データ（30種類）
+
+商品カタログサービスと連携して、以下の設備が管理されています：
+
+#### スキー板（13種類）
+- **レーシングGS**: Rossignol Hero Athlete FIS GS、Atomic Redster X9 WC GS
+- **レーシングSL**: Atomic Redster G9 FIS SL、Salomon S/Race Rush SL
+- **パウダー**: K2 Mindbender 108Ti、Volkl Mantra M6、Nordica Enforcer 110 Free
+- **モーグル**: K2 Mogul Ski
+- **初級・中級向け**: Salomon S/Max 8、Rossignol Experience 78 Ti、Atomic Vantage 75 C
+- **ジュニア**: Rossignol Experience Pro Jr、Salomon QST Max Jr
+
+#### その他設備（17種類）
+- **ストック**: Leki World Cup Racing GS、Atomic AMT SL、Black Diamond Traverse Pro
+- **スキーブーツ**: Salomon S/Pro 120、Atomic Hawx Ultra 130 S、Rossignol Pure Pro 80、Salomon Team T2
+- **ヘルメット**: POC Obex SPIN、Smith Vantage MIPS、Giro Launch Jr
+- **スキーウェア**: Patagonia Powder Bowl Jacket
+- **ゴーグル**: Oakley Flight Deck、Smith I/O MAG XL
+- **グローブ**: Hestra Army Leather Heli Ski
+- **バッグ**: Thule RoundTrip Ski Roller
+- **ワックス**: Swix CH7X Yellow
+- **チューンナップ**: Swix Economy Ski Vise
+
+### 在庫データ（52アイテム）
+
+各設備に対して複数の在庫アイテムが作成されており、以下の状況を含みます：
+
+- **利用可能**: 45アイテム（87%）
+- **レンタル中**: 7アイテム（13%）
+- **メンテナンス中**: 0アイテム
+- **廃棄済み**: 0アイテム
+
+### 店舗・倉庫（5箇所）
+
+- **メインストア**: 白馬村のメイン店舗
+- **レンタルカウンター**: レンタル専用カウンター
+- **メイン倉庫A**: 主要在庫保管場所
+- **サブ倉庫B**: 補助在庫保管場所
+- **メンテナンス工房**: 修理・点検専用施設
+
+### 現在のレンタル状況
+
+7件のアクティブなレンタルが進行中：
+- 中級者向けスキー板（2件）
+- ジュニア向けスキー板（1件）
+- スキーブーツ（1件）
+- ヘルメット（1件）
+- ゴーグル（1件）
+- グローブ（1件）
+
+### 在庫アラート（5件）
+
+- レーシングスキーの在庫不足（2件）
+- ジュニア向けスキーの高需要（1件）
+- スキーブーツのメンテナンス時期（1件）
+- ヘルメットXLサイズの在庫不足（1件）
+
+### データ連携
+
+- **商品カタログサービス**: `product_id`により30商品と連携
+- **ユーザー管理サービス**: `customer_id`により顧客と連携
+- **注文管理サービス**: 予約・注文との連携
+- **決済サービス**: レンタル料金・デポジットとの連携
 
 ## 開発者向け情報
 
