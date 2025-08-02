@@ -54,7 +54,7 @@ services.product.url=http://localhost:8082
 - `/products/*` → プロダクトカタログサービス (port 8083)（非推奨パス）
 - `/categories/*` → プロダクトカタログサービス (port 8083)（非推奨パス）
 - `/auth/*` → 認証サービス (port 8084)
-- `/inventory/*` → 在庫管理サービス (port 8085)
+- `/inventory/*`, `/api/v1/inventory/*` → 在庫管理サービス (port 8085)
 - `/orders/*` → 注文管理サービス (port 8086)
 - `/payments/*` → 決済サービス (port 8087)
 - `/cart/*` → ショッピングカートサービス (port 8088)
